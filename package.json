@@ -1,0 +1,24 @@
+{
+  "name": "manner-docs",
+  "version": "0.0.1",
+  "description": "Walk Manner-based api and generate docs from schema files directly. No need for Fancy code comments!",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joehop67/manner-docs.git"
+  },
+  "keywords": [
+    "manner",
+    "api",
+    "docs",
+    "documentation",
+    "data",
+    "web",
+    "tether"
+  ],
+  "author": "Joesph Hopkins",
+  "license": "MIT",
+  "dependencies": {
+    "mkdirp": "^0.5.1"
+  }
+}
