@@ -5,7 +5,6 @@ const join = path.join
 const mkdirp = require('mkdirp')
 const promisify = require('util').promisify
 const ejsRenderFile = promisify(require('ejs').renderFile)
-const globP = promisify(require('glob'))
 const util = require('util')
 
 /**
