@@ -1,6 +1,6 @@
 {
   "name": "manner-docs",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Walk Manner-based api and generate docs from schema files directly. No need for Fancy code comments!",
   "main": "index.js",
   "repository": {
