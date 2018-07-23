@@ -9,6 +9,7 @@ const {
 const util = require('util')
 const mkdirp = require('mkdirp')
 const mdGen = require('./markdownGen')
+const staticGen = require('./staticGen')
 
 /**
  * Generate documention from schema files
@@ -164,6 +165,12 @@ function jsonOutput (schemas, path, options = {}) {
   })
   if (options.output === 'markdown'){
     mdGen(docsPath)
+  } else if (options.output === 'static') {
+    if (typeof options.config === 'object') {
+      staticGen(docsPath, options.config)
+    } else {
+      staticGen(docsPath)
+    }
   }
 }
 

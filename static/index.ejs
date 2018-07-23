@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+  <link rel=”stylesheet” href=”/public/style.css”>
+</head>
+<body>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #4d4d4d;
+    }
+    .top-content {
+      margin: 2rem auto 2rem auto;
+      padding: 3rem 5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+    .api-data {
+      background: #33a3dc;
+      height: 100%;
+      width: 100%;
+    }
+    .api-data h3 {
+      margin: 0;
+    }
+    .path-list {
+      width: 75%;
+      margin: 0 4rem 0 4rem;
+    }
+    .collapse-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .method{
+      float: left;
+      width: auto;
+      height: 4rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 6px;
+    }
+    .table {
+      border: 1px solid #000;
+    }
+    td {
+      border: 1px solid #000;
+    }
+    .data-table {
+      display: flex;
+      flex-direction: column;
+      width: 75%;
+      margin: 0 auto;
+    }
+    .data {
+      order: 0;
+    }
+    .nested-btn {
+      order: 1;
+      margin: 2rem auto;
+      width: 30rem;
+    }
+    .complex {
+      order: 2;
+      margin: 0 auto;
+      width: 50%;
+    }
+    .data-table h2 {
+      text-align: center;
+    }
+    .post {
+      padding: 1rem;
+      background: green;
+    }
+    .get {
+      padding: 1rem;
+      background: blue;
+    }
+    .card-title {
+      margin-top: 0;
+    }
+  </style>
+  <div class='jumbotron top-content'>
+    <h1><%= apiData.name %></h1>
+    <h4><%= apiData.description %></h4>
+  </div>
+  <div class='path-list'>
+    <% for (var path in schemas){%>
+      <% for (var data in schemas[path]){%>
+        <%if (data === '/') {%>
+          <button class="btn btn-primary collapse-button" type="button" data-toggle='collapse' data-target='#collapse-root' aria-expanded="false" aria-controls='collapse-root'>
+            <span class='method <%= schemas[path][data].method %>'><h2><%= schemas[path][data].method %></h2></span> <h2>API Root ('/')</h2>
+          </button>
+          <div class="collapse" id='collapse-root'>
+            <div class="card card-body api-data">
+              <h2 class='card-title'>Title: <%= schemas[path][data].title %></h2>
+              <h3>Path: <%= data %></h3>
+              <h3>Description: <%= schemas[path][data].description || 'No Description Provided' %></h3>
+              <div class='data-table'>
+                <h2>Data</h2>
+                <table class='table data'>
+                  <thead>
+                    <tr>
+                      <th scope='col'>Name</th>
+                      <th scope='col'>Title</th>
+                      <th scope='col'>Type</th>
+                      <th scope='col'>Description</th>
+                      <th scope='col'>Required?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (typeof schemas[path][data].data === 'object') { %>
+                      <% for(var piece in schemas[path][data].data) { %>
+                        <% if (schemas[path][data].data[piece].type !== 'object' && schemas[path][data].data[piece].type !== 'array') {%>
+                          <tr>
+                            <td><%= piece %></td>
+                            <td><%= schemas[path][data].data[piece].title || '' %></td>
+                            <td><%= schemas[path][data].data[piece].type %></td>
+                            <td><%= schemas[path][data].data[piece].description || 'No description provided' %></td>
+                            <td><%= `${schemas[path][data].data[piece].required ? 'True' : 'False'}` %></td>
+                          </tr>
+                        <%}%>
+                        <% if (schemas[path][data].data[piece].type === 'object' || schemas[path][data].data[piece].type === 'array') { %>
+                          <% for (var deep in schemas[path][data].data[piece]) {%>
+                            <% if (typeof schemas[path][data].data[piece][deep] === 'object') {%>
+                              <button class='btn btn-primary nested-btn' type='button' data-toggle='collapse' data-target='#collapse-complex-<%= piece %>' aria-expanded='false' aria-controls='#collapse-complex-<%= piece %>'>
+                                Nested Data: <%= piece %>
+                              </button>
+                              <div class='complex'>
+                                <div class='collapse' id='collapse-complex-<%= piece %>'>
+                                  <ul>
+                                    <li>Data Name: <%= deep %></li>
+                                    <li>Title: <%= schemas[path][data].data[piece][deep].title || 'No Title' %></li>
+                                    <li>Description: <%= schemas[path][data].data[piece][deep].description || 'No description provided' %>
+                                  </ul>
+                                  <% for (var nested in schemas[path][data].data[piece][deep]) { %>
+                                    <% if (typeof schemas[path][data].data[piece][deep][nested] === 'object') { %>
+                                      <h3><%= nested %>
+                                      <pre>
+                                        <%= JSON.stringify(schemas[path][data].data[piece][deep][nested], null, 2) %>
+                                      </pre>
+                                    <%}%>
+                                  <%}%>
+                                </div>
+                              </div>
+                            <%}%>
+                          <%}%>
+                        <%}%>
+                      <%}%>
+                    <%}%>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <% break %>
+        <%}%>
+        <button class="btn btn-primary collapse-button" type="button" data-toggle='collapse' data-target="#collapse-<%= schemas[path][data].id %>" aria-expanded="false" aria-controls='collapse-<%= schemas[path][data].id %>'>
+          <span class='method <%= schemas[path][data].method %>'><h2><%= schemas[path][data].method %></h2></span> <h2><%= schemas[path][data].path %></h2>
+        </button>
+        <div class="collapse" id='collapse-<%= schemas[path][data].id %>'>
+          <div class="card card-body api-data">
+            <h2 class='card-title'>Title: <%= schemas[path][data].title %></h2>
+            <h3>Path: <%= data %></h3>
+            <h3>Description: <%= schemas[path][data].description || 'No Description Provided' %></h3>
+            <div class='data-table'>
+              <h2>Data</h2>
+              <table class='table data'>
+                <thead>
+                  <tr>
+                    <th scope='col'>Name</th>
+                    <th scope='col'>Title</th>
+                    <th scope='col'>Type</th>
+                    <th scope='col'>Description</th>
+                    <th scope='col'>Required?</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (typeof schemas[path][data].data === 'object') { %>
+                    <% for(var piece in schemas[path][data].data) { %>
+                      <% if (schemas[path][data].data[piece].type !== 'object' && schemas[path][data].data[piece].type !== 'array') {%>
+                        <tr>
+                          <td><%= piece %></td>
+                          <td><%= schemas[path][data].data[piece].title || '' %></td>
+                          <td><%= schemas[path][data].data[piece].type %></td>
+                          <td><%= schemas[path][data].data[piece].description || 'No description provided' %></td>
+                          <td><%= `${schemas[path][data].data[piece].required ? 'True' : 'False'}` %></td>
+                        </tr>
+                      <%}%>
+                      <% if (schemas[path][data].data[piece].type === 'object' || schemas[path][data].data[piece].type === 'array') { %>
+                        <% for (var deep in schemas[path][data].data[piece]) {%>
+                          <% if (typeof schemas[path][data].data[piece][deep] === 'object') {%>
+                            <button class='btn btn-primary nested-btn' type='button' data-toggle='collapse' data-target='#collapse-complex-<%= piece %>' aria-expanded='false' aria-controls='#collapse-complex-<%= piece %>'>
+                              Nested Data: <%= piece %>
+                            </button>
+                            <div class='complex'>
+                              <div class='collapse' id='collapse-complex-<%= piece %>'>
+                                <ul>
+                                  <li>Data Name: <%= deep %></li>
+                                  <li>Title: <%= schemas[path][data].data[piece][deep].title || 'No Title' %></li>
+                                  <li>Description: <%= schemas[path][data].data[piece][deep].description || 'No description provided' %>
+                                </ul>
+                                <% for (var nested in schemas[path][data].data[piece][deep]) { %>
+                                  <% if (typeof schemas[path][data].data[piece][deep][nested] === 'object') { %>
+                                    <h3><%= nested %>
+                                    <pre>
+                                      <%= JSON.stringify(schemas[path][data].data[piece][deep][nested], null, 2) %>
+                                    </pre>
+                                  <%}%>
+                                <%}%>
+                              </div>
+                            </div>
+                          <%}%>
+                        <%}%>
+                      <%}%>
+                    <%}%>
+                  <%}%>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      <%}%>
+  </div>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
+  <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
+</body>
+</html>
